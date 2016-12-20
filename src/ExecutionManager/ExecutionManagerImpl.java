@@ -22,7 +22,7 @@ public class ExecutionManagerImpl implements ExecutionManager {
         Thread executorThread = new Thread(new Runnable() {
             @Override
             public void run() {
-                for (Thread thread : threadPull) {
+                for (MyThread thread : threadPull) {
                     try {
                         Thread.sleep(10);
                     } catch (InterruptedException e) {
@@ -30,6 +30,15 @@ public class ExecutionManagerImpl implements ExecutionManager {
                     }
                     thread.start();
                 }
+
+                for (MyThread myThread : threadPull) {
+                    try {
+                        myThread.join();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                callback.run();
             }
         });
         executorThread.start();
@@ -48,7 +57,7 @@ public class ExecutionManagerImpl implements ExecutionManager {
             }
 
         }
-        Context context = manager.execute(null, runnables);
+        Context context = manager.execute(()-> System.out.println("callback"), runnables);
         Thread.sleep(100);
         context.interrupt();
         System.out.println("Interrupted: " + context.getInterruptedTaskCount());
